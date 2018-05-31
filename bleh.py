@@ -12,6 +12,28 @@ from pyfm import pylibfm
 from sklearn.feature_extraction import DictVectorizer
 import numpy as np
 
+
+def similarity(x,y):
+	acumup = 0
+	acumdown = 0
+	A = 0
+	B = 0
+	for i in x:
+		for j in y:
+			item1 = i["itemId"]
+			item2 = j["itemId"]
+			item1ra = i["rating"]
+			item2ra = j["rating"]
+			if item1 == item2:
+				acumup += item1ra * item2ra
+				A += item1ra ** 2
+				B += item2ra ** 2
+	acumdown = math.sqrt(A) * math.sqrt(B);
+	if acumdown == 0 or acumup == 0:
+		print "not similar at all"
+		return
+	similarity = acumup/acumdown;
+	print similarity
 file_path = os.path.expanduser('restaurant-data-with-consumer-ratings/rating_final.csv')
 #reader = Reader(line_format='userId placeId rating food_rating service_rating', sep=',')
 #data = Dataset.load_from_file(file_path, reader=reader)
@@ -112,6 +134,10 @@ print "FM MSE: %.4f" % math.sqrt(mean_squared_error(ratingsTest,preds))
 vectorizer = DictVectorizer()
 X = vectorizer.fit_transform(forcollab["U1003"])
 Y = vectorizer.transform(forcollab["U1003"])
+for  u in forcollab:
+	print u
+	similarity(forcollab["U1003"],forcollab[u])
+
 #print vectorizer.get_feature_names()
 la = sklearn.metrics.pairwise.cosine_similarity(X,Y)
 #print la
@@ -132,5 +158,5 @@ la = sklearn.metrics.pairwise.cosine_similarity(X,Y)
 	#print geoplace[qw]
 #print forcollab
 #print "\n"
-print la
-print vectorizer.get_feature_names()
+#print la
+#print vectorizer.get_feature_names()
