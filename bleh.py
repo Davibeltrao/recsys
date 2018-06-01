@@ -149,13 +149,13 @@ largestId = ""
 for  u in forcollab:
 	actual = 0
 	print u
-	actual = similarity(forcollab["U1003"],forcollab[u])
+	actual = similarity(forcollab["U1061"],forcollab[u])
 	if actual > largest:
 		largest = actual
 		largestId = u
 print largestId
 print usergeneral[u]
-print usergeneral["U1003"]
+print usergeneral["U1061"]
 preference = {}
 preference["ambience"] = {}
 preference["cuisine"] = {}
@@ -184,16 +184,16 @@ for qw in bestRest["U1061"]:
 	if qw in parking:
 		#print "parking " + ''.join(parking[qw])
 		if qw in geoplace:
-			print geoplace[qw]
+			#print geoplace[qw]
 			if geoplace[qw][12] not in preference["ambience"]:
 				preference["ambience"][geoplace[qw][12]] = 0
 			preference["ambience"][geoplace[qw][12]] +=1
 			if geoplace[qw][16] not in preference["style"]:
 				preference["style"][geoplace[qw][16]] = 0
-				preference["style"][geoplace[qw][16]] += 1
+			preference["style"][geoplace[qw][16]] += 1
 			if geoplace[qw][14] not in preference["price"]:
 				preference["price"][geoplace[qw][14]] = 0
-				preference["price"][geoplace[qw][14]] +=1
+			preference["price"][geoplace[qw][14]] +=1
 print preference
 #print forcollab
 #print "\n"
