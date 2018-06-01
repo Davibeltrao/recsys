@@ -33,7 +33,7 @@ def similarity(x,y):
 		print "not similar at all"
 		return
 	similarity = acumup/acumdown;
-	print similarity
+	return  similarity
 file_path = os.path.expanduser('restaurant-data-with-consumer-ratings/rating_final.csv')
 #reader = Reader(line_format='userId placeId rating food_rating service_rating', sep=',')
 #data = Dataset.load_from_file(file_path, reader=reader)
@@ -99,6 +99,16 @@ with open('restaurant-data-with-consumer-ratings/userprofile.csv') as csvfile:
 			usergeneral[row[0]] = []	
 			for p in iterrows:
 				usergeneral[row[0]].append(p)
+with open('restaurant-data-with-consumer-ratings/geoplaces2.csv') as csvfile:
+	spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+	for row in spamreader:
+			iterrows = iter(row)
+			next(iterrows)
+			geoplace[row[0]] = []	
+			for p in iterrows:
+				geoplace[row[0]].append(p)
+#############3
+
 with open('restaurant-data-with-consumer-ratings/rating_final.csv') as csvfile:
 	spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
 	for row in spamreader:
@@ -134,28 +144,57 @@ print "FM MSE: %.4f" % math.sqrt(mean_squared_error(ratingsTest,preds))
 vectorizer = DictVectorizer()
 X = vectorizer.fit_transform(forcollab["U1003"])
 Y = vectorizer.transform(forcollab["U1003"])
+largest = 0
+largestId = ""
 for  u in forcollab:
+	actual = 0
 	print u
-	similarity(forcollab["U1003"],forcollab[u])
-
-#print vectorizer.get_feature_names()
-la = sklearn.metrics.pairwise.cosine_similarity(X,Y)
-#print la
-#print forcollab
-#for i in forcollab:
-#	if i["rating"] >=2:
-#		if i["userId"] not in bestRest:
-#			bestRest[i["userId"]] = []
-#		else:
-#			bestRest[i["userId"]].append(i["itemId"])
-#for qw in bestRest["U1061"]:
-#	if qw in accepts:
-#		print "accepts " + ''.join(accepts[qw])
-#	if qw in cuisine:
-#		print "cuisine " + ''.join(cuisine[qw])
-#	if qw in parking:
-#		print "parking " + ''.join(parking[qw])
-	#print geoplace[qw]
+	actual = similarity(forcollab["U1003"],forcollab[u])
+	if actual > largest:
+		largest = actual
+		largestId = u
+print largestId
+print usergeneral[u]
+print usergeneral["U1003"]
+preference = {}
+preference["ambience"] = {}
+preference["cuisine"] = {}
+preference ["familiarity"] = {}
+preference ["style"] = {}
+preference["price"] = {}
+for i in forcollab:
+	for a in forcollab[i]:
+		if a["rating"] >=2:
+			if i not in bestRest:
+				bestRest[i] = []
+			else:
+				bestRest[i].append(a["itemId"])
+for qw in bestRest["U1061"]:
+	#if qw in accepts:
+		#print "accepts " + ''.join(accepts[qw])
+		
+	if qw in cuisine:
+		print "LOOOOOKKKKK FOR CUISIONE"
+		#print cuisine
+		#print "cuisine " + ''.join(cuisine[qw])
+		for i in cuisine[qw]:
+			if i not in preference["cuisine"]:
+				preference["cuisine"][i] = 0
+			preference["cuisine"][i]+= 1
+	if qw in parking:
+		#print "parking " + ''.join(parking[qw])
+		if qw in geoplace:
+			print geoplace[qw]
+			if geoplace[qw][12] not in preference["ambience"]:
+				preference["ambience"][geoplace[qw][12]] = 0
+			preference["ambience"][geoplace[qw][12]] +=1
+			if geoplace[qw][16] not in preference["style"]:
+				preference["style"][geoplace[qw][16]] = 0
+				preference["style"][geoplace[qw][16]] += 1
+			if geoplace[qw][14] not in preference["price"]:
+				preference["price"][geoplace[qw][14]] = 0
+				preference["price"][geoplace[qw][14]] +=1
+print preference
 #print forcollab
 #print "\n"
 #print la
