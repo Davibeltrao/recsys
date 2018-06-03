@@ -11,7 +11,100 @@ from surprise.model_selection import cross_validate
 from pyfm import pylibfm
 from sklearn.feature_extraction import DictVectorizer
 import numpy as np
+accepts = {}
+cuisine = {}
+parking = {}
+geoplace = {}
+usercuisine = {}
+userpay = {}
+usergeneral = {}
+ratings = {}
+bestRest = {}
 
+
+def GetPredictedFeature(forcollab,userId):
+	predictedFeatures = {}
+	largest = 0
+	largestId = ""
+	for  u in forcollab:
+		actual = 0
+		print u
+		actual = similarity(forcollab[userId],forcollab[u])
+		if actual > largest:
+			largest = actual
+			largestId = u
+	print largestId
+	print " most close " 
+	print usergeneral[u]
+	print "most close cuisine"
+	print usercuisine[u]
+	print "user"
+	print usergeneral[userId]
+	print "user cuisine"
+	print usercuisine[userId]
+	preference = {}
+	preference["ambience"] = {}
+	preference["cuisine"] = {}
+	preference ["accepts"] = {}
+	preference ["style"] = {}
+	preference["price"] = {}
+	preference["parking"] = {}
+	preference["alcohol"] = {}
+	preference["smoking"] = {}
+	greatestValues = {}
+	for i in forcollab:
+		for a in forcollab[i]:
+			if a["rating"] >=2:
+				if i not in bestRest:
+					bestRest[i] = []
+				else:
+					bestRest[i].append(a["itemId"])
+	for qw in bestRest[userId]:
+		if qw in accepts:
+			for i in accepts[qw]:
+				if i not in preference["accepts"]:
+					preference["accepts"][i] = 0
+				preference["accepts"][i]+= 1
+		if qw in cuisine:
+			for i in cuisine[qw]:
+				if i not in preference["cuisine"]:
+					preference["cuisine"][i] = 0
+				preference["cuisine"][i]+= 1
+		if qw in parking:
+			for i in parking[qw]:
+				if i not in preference["parking"]:
+					preference["parking"][i] = 0
+				preference["parking"][i]+= 1
+			if qw in geoplace:
+				#print geoplace[qw]
+				if geoplace[qw][12] not in preference["ambience"]:
+					preference["ambience"][geoplace[qw][12]] = 0
+				preference["ambience"][geoplace[qw][12]] +=1
+				if geoplace[qw][16] not in preference["style"]:
+					preference["style"][geoplace[qw][16]] = 0
+				preference["style"][geoplace[qw][16]] += 1
+				if geoplace[qw][14] not in preference["price"]:
+					preference["price"][geoplace[qw][14]] = 0
+				preference["price"][geoplace[qw][14]] +=1
+				if geoplace[qw][10] not in preference["alcohol"]:
+					preference["alcohol"][geoplace[qw][10]] = 0
+				preference["alcohol"][geoplace[qw][10]] +=1
+				if geoplace[qw][10] not in preference["smoking"]:
+					preference["smoking"][geoplace[qw][11]] = 0
+				preference["smoking"][geoplace[qw][11]] +=1			
+	for i in preference:
+		greatestValues[i] = getBiggest(preference[i])
+	print greatestValues
+
+
+def getBiggest(mapId):
+	greatest = 0;
+	greatestId = "dummy"
+	for i in mapId:
+		if mapId[i] > greatest:
+			greatest = mapId[i]
+			greatestId = i
+	return greatestId
 
 def similarity(x,y):
 	acumup = 0
@@ -37,15 +130,6 @@ def similarity(x,y):
 file_path = os.path.expanduser('restaurant-data-with-consumer-ratings/rating_final.csv')
 #reader = Reader(line_format='userId placeId rating food_rating service_rating', sep=',')
 #data = Dataset.load_from_file(file_path, reader=reader)
-accepts = {}
-cuisine = {}
-parking = {}
-geoplace = {}
-usercuisine = {}
-userpay = {}
-usergeneral = {}
-ratings = {}
-bestRest = {}
 data = []
 onlyRatings = []
 forcollab = {}
@@ -144,60 +228,4 @@ print "FM MSE: %.4f" % math.sqrt(mean_squared_error(ratingsTest,preds))
 vectorizer = DictVectorizer()
 X = vectorizer.fit_transform(forcollab["U1003"])
 Y = vectorizer.transform(forcollab["U1003"])
-largest = 0
-largestId = ""
-for  u in forcollab:
-	actual = 0
-	print u
-	actual = similarity(forcollab["U1003"],forcollab[u])
-	if actual > largest:
-		largest = actual
-		largestId = u
-print largestId
-print " most close " 
-print usergeneral[u]
-print "most close cuisine"
-print usercuisine[u]
-print "user"
-print usergeneral["U1003"]
-print "user cuisine"
-print usercuisine["U1003"]
-preference = {}
-preference["ambience"] = {}
-preference["cuisine"] = {}
-preference ["familiarity"] = {}
-preference ["style"] = {}
-preference["price"] = {}
-for i in forcollab:
-	for a in forcollab[i]:
-		if a["rating"] >=2:
-			if i not in bestRest:
-				bestRest[i] = []
-			else:
-				bestRest[i].append(a["itemId"])
-for qw in bestRest["U1003"]:
-	#if qw in accepts:
-		#print "accepts " + ''.join(accepts[qw])
-		
-	if qw in cuisine:
-		print "LOOOOOKKKKK FOR CUISIONE"
-		#print cuisine
-		#print "cuisine " + ''.join(cuisine[qw])
-		for i in cuisine[qw]:
-			if i not in preference["cuisine"]:
-				preference["cuisine"][i] = 0
-			preference["cuisine"][i]+= 1
-	if qw in parking:
-		#print "parking " + ''.join(parking[qw])
-		if qw in geoplace:
-			#print geoplace[qw]
-			if geoplace[qw][12] not in preference["ambience"]:
-				preference["ambience"][geoplace[qw][12]] = 0
-			preference["ambience"][geoplace[qw][12]] +=1
-			if geoplace[qw][16] not in preference["style"]:
-				preference["style"][geoplace[qw][16]] = 0
-			preference["style"][geoplace[qw][16]] += 1
-			if geoplace[qw][14] not in preference["price"]:
-				preference["price"][geoplace[qw][14]] = 0
-			preference["price"][geoplace[qw][14]] +=1
-print preference
+GetPredictedFeature(forcollab,"U1003")
