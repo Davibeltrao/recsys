@@ -95,6 +95,21 @@ def GetPredictedFeature(forcollab,userId):
 	for i in preference:
 		greatestValues[i] = getBiggest(preference[i])
 	print greatestValues
+	print UserSimilarity(usergeneral[userId],usergeneral[u])
+
+def UserSimilarity(userVec,mostSimilarVec):
+	#we can weight each data and use the two weighted info(from te restaurants user like and from users that a similar)
+	confiability = 0.0
+	numberEqual = 0.0;
+	featureNum = 0.0;
+	for i in range(0,len(userVec)):
+		if userVec[i] == mostSimilarVec[i]:
+			print userVec[i] + "jsjsjsj" + mostSimilarVec[i]
+			numberEqual += 1
+			print numberEqual
+		featureNum += 1
+	confiability = numberEqual/featureNum
+	return confiability
 
 
 def getBiggest(mapId):
