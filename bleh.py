@@ -149,13 +149,19 @@ largestId = ""
 for  u in forcollab:
 	actual = 0
 	print u
-	actual = similarity(forcollab["U1061"],forcollab[u])
+	actual = similarity(forcollab["U1003"],forcollab[u])
 	if actual > largest:
 		largest = actual
 		largestId = u
 print largestId
+print " most close " 
 print usergeneral[u]
-print usergeneral["U1061"]
+print "most close cuisine"
+print usercuisine[u]
+print "user"
+print usergeneral["U1003"]
+print "user cuisine"
+print usercuisine["U1003"]
 preference = {}
 preference["ambience"] = {}
 preference["cuisine"] = {}
@@ -169,7 +175,7 @@ for i in forcollab:
 				bestRest[i] = []
 			else:
 				bestRest[i].append(a["itemId"])
-for qw in bestRest["U1061"]:
+for qw in bestRest["U1003"]:
 	#if qw in accepts:
 		#print "accepts " + ''.join(accepts[qw])
 		
@@ -195,7 +201,3 @@ for qw in bestRest["U1061"]:
 				preference["price"][geoplace[qw][14]] = 0
 			preference["price"][geoplace[qw][14]] +=1
 print preference
-#print forcollab
-#print "\n"
-#print la
-#print vectorizer.get_feature_names()
