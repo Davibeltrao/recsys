@@ -104,7 +104,7 @@ def getBiggest(mapId):
 		if mapId[i] > greatest:
 			greatest = mapId[i]
 			greatestId = i
-	return greatestId
+	return (greatestId,greatest)
 
 def similarity(x,y):
 	acumup = 0
