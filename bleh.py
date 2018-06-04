@@ -98,7 +98,7 @@ def GetPredictedFeature(forcollab,userId):
 	print UserSimilarity(usergeneral[userId],usergeneral[u])
 
 def UserSimilarity(userVec,mostSimilarVec):
-	#we can weight each data and use the two weighted info(from te restaurants user like and from users that a similar)
+	#we can weight each data and use the two weighted info(from te restaurants user like and from users that a similar sometimes user similarity is way more accurate than user preferences)
 	confiability = 0.0
 	numberEqual = 0.0;
 	featureNum = 0.0;
