@@ -24,6 +24,7 @@ bestRest = {}
 
 def GetPredictedFeature(forcollab,userId):
 	predictedFeatures = {}
+	characteristics = {"smoker": 2, "drink_level": 3,"dress_pref":4,"ambience":5,"Transport":6, "Marital":7, "filhos":8,"interest":10, "personality":11, "religion":12,"activity":13,"budget":16}
 	largest = 0
 	largestId = ""
 	for  u in forcollab:
@@ -43,10 +44,10 @@ def GetPredictedFeature(forcollab,userId):
 	print "user cuisine"
 	print usercuisine[userId]
 	preference = {}
-	preference["ambience"] = {}
+	preference["dress_pref"] = {}
 	preference["cuisine"] = {}
 	preference ["accepts"] = {}
-	preference ["style"] = {}
+	preference ["ambience"] = {}
 	preference["price"] = {}
 	preference["parking"] = {}
 	preference["alcohol"] = {}
@@ -77,12 +78,12 @@ def GetPredictedFeature(forcollab,userId):
 				preference["parking"][i]+= 1
 			if qw in geoplace:
 				#print geoplace[qw]
-				if geoplace[qw][12] not in preference["ambience"]:
-					preference["ambience"][geoplace[qw][12]] = 0
-				preference["ambience"][geoplace[qw][12]] +=1
-				if geoplace[qw][16] not in preference["style"]:
-					preference["style"][geoplace[qw][16]] = 0
-				preference["style"][geoplace[qw][16]] += 1
+				if geoplace[qw][12] not in preference["dress_pref"]:
+					preference["dress_pref"][geoplace[qw][12]] = 0
+				preference["dress_pref"][geoplace[qw][12]] +=1
+				if geoplace[qw][16] not in preference["ambience"]:
+					preference["ambience"][geoplace[qw][16]] = 0
+				preference["ambience"][geoplace[qw][16]] += 1
 				if geoplace[qw][14] not in preference["price"]:
 					preference["price"][geoplace[qw][14]] = 0
 				preference["price"][geoplace[qw][14]] +=1
@@ -95,8 +96,25 @@ def GetPredictedFeature(forcollab,userId):
 	for i in preference:
 		greatestValues[i] = getBiggest(preference[i])
 	print greatestValues
-	print UserSimilarity(usergeneral[userId],usergeneral[u])
+	#print UserSimilarity(usergeneral[userId],usergeneral[u])
+	similaridade =  UserSimilarity(usergeneral[userId],usergeneral[u])
+	
+	for feature in characteristics:
+		if feature not in greatestValues:
+			predictedFeatures[feature] = usergeneral[u][characteristics[feature]]
+		else:
+			if similaridade > greatestValues[feature][1]:
+				predictedFeatures[feature] = usergeneral[u][characteristics[feature]]
+			else:
+				predictedFeatures[feature] = greatestValues[feature][0]
+	predictedFeatures["cuisine"] = greatestValues["cuisine"][0]  if similaridade < greatestValues["cuisine"][1] else usercuisine[u]
 
+	#to decide se nao serve alcool colocamos abstemio? ou olhamos usuario semelhante para decidir melhor, igual com smoke(boa ideia)
+	#if UserSimilarity(usergeneral[userId],usergeneral[u]) > 0.3:
+	#	predictedFeatures = {"smoker": usergeneral[u][3], "drink_level": usergeneral[u][4],"dress_pref": usergeneral[u][5],"ambience": usergeneral[u][6],"Transport": usergeneral[u][7], "Marital": usergeneral[u][8], "filhos": usergeneral[u][9],"interest": usergeneral[u][11], "personality": usergeneral[u][12], "religion": usergeneral[u][13],"activity":usergeneral[u][14],"budget": usergeneral[u][17]}
+	#else:
+	#	predictedFeatures = {"smoker": "false" if greatestValues["smoking"] == "none" else "true", "drink_level": usergeneral[u][4],"dress_pref": usergeneral[u][5],"ambience": usergeneral[u][6],"Transport": usergeneral[u][7], "Marital": usergeneral[u][8], "filhos": usergeneral[u][9],"interest": usergeneral[u][11], "personality": usergeneral[u][12], "religion": usergeneral[u][13],"activity":usergeneral[u][14],"budget": usergeneral[u][17]}
+	print predictedFeatures
 def UserSimilarity(userVec,mostSimilarVec):
 	#we can weight each data and use the two weighted info(from te restaurants user like and from users that a similar sometimes user similarity is way more accurate than user preferences)
 	confiability = 0.0
@@ -104,22 +122,22 @@ def UserSimilarity(userVec,mostSimilarVec):
 	featureNum = 0.0;
 	for i in range(0,len(userVec)):
 		if userVec[i] == mostSimilarVec[i]:
-			print userVec[i] + "jsjsjsj" + mostSimilarVec[i]
 			numberEqual += 1
-			print numberEqual
 		featureNum += 1
 	confiability = numberEqual/featureNum
 	return confiability
 
 
 def getBiggest(mapId):
-	greatest = 0;
+	greatest = 0.0;
+	cont = 0.0
 	greatestId = "dummy"
 	for i in mapId:
+		cont += mapId[i]
 		if mapId[i] > greatest:
 			greatest = mapId[i]
 			greatestId = i
-	return (greatestId,greatest)
+	return (greatestId,greatest/cont)
 
 def similarity(x,y):
 	acumup = 0
